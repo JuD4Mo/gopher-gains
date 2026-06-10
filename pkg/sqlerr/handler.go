@@ -148,13 +148,13 @@ func HandleError(err error) error {
 
 		switch sqlErr.Code {
 		case ForeignKeyViolation:
-			return errs.NewBadRequestError(userMessage, false, &errorCode, nil, nil)
+			return errs.NewBadRequestError(userMessage, false, &errorCode, nil)
 		case UniqueViolation:
 			columnName := extractColumnForUniqueViolation(sqlErr.ConstraintName)
 			if columnName != "" {
 				userMessage = strings.ReplaceAll(userMessage, "identifier", humanizeText(columnName))
 			}
-			return errs.NewBadRequestError(userMessage, true, &errorCode, nil, nil)
+			return errs.NewBadRequestError(userMessage, true, &errorCode, nil)
 		case NotNullViolation:
 			fieldErrors := []errs.FieldError{
 				{
@@ -162,9 +162,9 @@ func HandleError(err error) error {
 					Error: "is required",
 				},
 			}
-			return errs.NewBadRequestError(userMessage, true, &errorCode, fieldErrors, nil)
+			return errs.NewBadRequestError(userMessage, true, &errorCode, fieldErrors)
 		case CheckViolation:
-			return errs.NewBadRequestError(userMessage, true, &errorCode, nil, nil)
+			return errs.NewBadRequestError(userMessage, true, &errorCode, nil)
 		default:
 			return errs.NewInternalServerError()
 		}

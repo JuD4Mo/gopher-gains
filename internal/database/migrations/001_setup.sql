@@ -19,7 +19,7 @@ CREATE TYPE routine_type_enum AS ENUM (
     'customized'
 );
 
-CREATE TABLE "USER" (
+CREATE TABLE "user" (
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE "USER" (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE "EXERCISE" (
+CREATE TABLE exercise (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     target_muscle_group muscle_group_enum NOT NULL,
@@ -40,7 +40,7 @@ CREATE TABLE "EXERCISE" (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE "ROUTINE" (
+CREATE TABLE routine (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description TEXT,
@@ -52,33 +52,33 @@ CREATE TABLE "ROUTINE" (
 
 -- relations
 
-CREATE TABLE "USER_ROUTINE" (
-    user_id INT REFERENCES "USER"(id) ON DELETE CASCADE,
-    routine_id INT REFERENCES "ROUTINE"(id) ON DELETE CASCADE,
+CREATE TABLE user_routine (
+    user_id INT REFERENCES "user"(id) ON DELETE CASCADE,
+    routine_id INT REFERENCES routine(id) ON DELETE CASCADE,
     assigned_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (user_id, routine_id) -- Llave primaria compuesta
+    PRIMARY KEY (user_id, routine_id)
 );
 
-CREATE TABLE "ROUTINE_EXERCISE" (
-    routine_id INT REFERENCES "ROUTINE"(id) ON DELETE CASCADE,
-    exercise_id INT REFERENCES "EXERCISE"(id) ON DELETE CASCADE,
-    step_number INT NOT NULL, -- Atributo extra para ordenar los ejercicios en la interfaz
-    PRIMARY KEY (routine_id, exercise_id) -- Llave primaria compuesta
+CREATE TABLE routine_exercise (
+    routine_id INT REFERENCES routine(id) ON DELETE CASCADE,
+    exercise_id INT REFERENCES exercise(id) ON DELETE CASCADE,
+    step_number INT NOT NULL,
+    PRIMARY KEY (routine_id, exercise_id)
 );
 
-CREATE TABLE "WORKOUT_SESSION" (
+CREATE TABLE workout_session (
     id SERIAL PRIMARY KEY,
-    user_id INT NOT NULL REFERENCES "USER"(id) ON DELETE CASCADE,
+    user_id INT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
     start_time TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     end_time TIMESTAMP WITH TIME ZONE,
     status session_status_enum NOT NULL DEFAULT 'in_progress',
     observations TEXT
 );
 
-CREATE TABLE "EXERCISE_SET" (
+CREATE TABLE exercise_set (
     id SERIAL PRIMARY KEY,
-    wsession_id INT NOT NULL REFERENCES "WORKOUT_SESSION"(id) ON DELETE CASCADE,
-    exercise_id INT NOT NULL REFERENCES "EXERCISE"(id) ON DELETE RESTRICT,
+    wsession_id INT NOT NULL REFERENCES workout_session(id) ON DELETE CASCADE,
+    exercise_id INT NOT NULL REFERENCES exercise(id) ON DELETE RESTRICT,
     weight NUMERIC(6, 2) NOT NULL,
     repetitions INT NOT NULL,
     rir INT CHECK (rir >= 0 AND rir <= 10) DEFAULT 3,
@@ -87,13 +87,13 @@ CREATE TABLE "EXERCISE_SET" (
 
 ---- create above / drop below ----
 
-DROP TABLE IF EXISTS "EXERCISE_SET";
-DROP TABLE IF EXISTS "WORKOUT_SESSION";
-DROP TABLE IF EXISTS "ROUTINE_EXERCISE";
-DROP TABLE IF EXISTS "USER_ROUTINE";
-DROP TABLE IF EXISTS "ROUTINE";
-DROP TABLE IF EXISTS "EXERCISE";
-DROP TABLE IF EXISTS "USER";
+DROP TABLE IF EXISTS exercise_set;
+DROP TABLE IF EXISTS workout_session;
+DROP TABLE IF EXISTS routine_exercise;
+DROP TABLE IF EXISTS user_routine;
+DROP TABLE IF EXISTS routine;
+DROP TABLE IF EXISTS exercise;
+DROP TABLE IF EXISTS "user";
 
 DROP TYPE IF EXISTS routine_type_enum;
 DROP TYPE IF EXISTS session_status_enum;

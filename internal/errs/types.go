@@ -22,7 +22,7 @@ func NewForbiddenError(message string, override bool) *HTTPError {
 	}
 }
 
-func NewBadRequestError(message string, override bool, code *string, errors []FieldError, action *Action) *HTTPError {
+func NewBadRequestError(message string, override bool, code *string, errors []FieldError) *HTTPError {
 	formattedCode := MakeUpperCaseWithUnderscores(http.StatusText(http.StatusBadRequest))
 
 	if code != nil {
@@ -35,7 +35,6 @@ func NewBadRequestError(message string, override bool, code *string, errors []Fi
 		Status:   http.StatusBadRequest,
 		Override: override,
 		Errors:   errors,
-		Action:   action,
 	}
 }
 
@@ -64,5 +63,5 @@ func NewInternalServerError() *HTTPError {
 }
 
 func ValidationError(err error) *HTTPError {
-	return NewBadRequestError("Validation failed: "+err.Error(), false, nil, nil, nil)
+	return NewBadRequestError("Validation failed: "+err.Error(), false, nil, nil)
 }

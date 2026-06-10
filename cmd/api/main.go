@@ -10,7 +10,7 @@ import (
 
 	"github.com/JuD4Mo/gopher-gains/internal/config"
 	"github.com/JuD4Mo/gopher-gains/internal/database"
-	"github.com/JuD4Mo/gopher-gains/internal/item"
+	"github.com/JuD4Mo/gopher-gains/internal/exercise"
 	"github.com/JuD4Mo/gopher-gains/internal/router"
 	"github.com/JuD4Mo/gopher-gains/internal/server"
 	"github.com/JuD4Mo/gopher-gains/pkg/logger"
@@ -34,11 +34,15 @@ func main() {
 		appLogger.Fatal().Err(err).Msg("failed to initialize server")
 	}
 
-	itemRepo := item.NewRepository(srv.DB.Pool)
-	itemSvc := item.NewService(itemRepo)
-	itemCtrl := item.NewController(itemSvc)
+	exerciseRepo := exercise.NewRepository(srv.DB.Pool)
+	exerciseService := exercise.NewService(exerciseRepo)
+	exerciseController := exercise.NewController(exerciseService)
 
-	r := router.NewRouter(srv, itemCtrl)
+	controllers := router.Controllers{
+		ExerciseController: exerciseController,
+	}
+
+	r := router.NewRouter(srv, controllers)
 
 	srv.SetupHTTPServer(r)
 

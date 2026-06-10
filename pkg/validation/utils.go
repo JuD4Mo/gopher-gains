@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
+
 	"github.com/JuD4Mo/gopher-gains/internal/errs"
 
 	"github.com/go-playground/validator/v10"
@@ -35,17 +36,17 @@ func (c CustomValidationErrors) Error() string {
 
 func BindAndValidate(r *http.Request, payload Validatable) error {
 	if err := json.NewDecoder(r.Body).Decode(payload); err != nil {
-		return errs.NewBadRequestError("invalid request body", false, nil, nil, nil)
+		return errs.NewBadRequestError("invalid request body", false, nil, nil)
 	}
 
 	if err := payload.Validate(); err != nil {
 		msg, fieldErrors := extractValidationErrors(err)
-		return errs.NewBadRequestError(msg, true, nil, fieldErrors, nil)
+		return errs.NewBadRequestError(msg, true, nil, fieldErrors)
 	}
 
 	if err := validate.Struct(payload); err != nil {
 		msg, fieldErrors := extractValidationErrors(err)
-		return errs.NewBadRequestError(msg, true, nil, fieldErrors, nil)
+		return errs.NewBadRequestError(msg, true, nil, fieldErrors)
 	}
 
 	return nil

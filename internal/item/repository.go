@@ -13,7 +13,9 @@ type repo struct {
 }
 
 func NewRepository(pool *pgxpool.Pool) Repository {
-	return &repo{pool: pool}
+	return &repo{
+		pool: pool,
+	}
 }
 
 func (r *repo) Create(ctx context.Context, item *Item) error {

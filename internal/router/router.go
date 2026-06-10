@@ -3,6 +3,7 @@ package router
 import (
 	"net/http"
 
+	"github.com/JuD4Mo/gopher-gains/internal/exercise"
 	"github.com/JuD4Mo/gopher-gains/internal/item"
 	"github.com/JuD4Mo/gopher-gains/internal/middleware"
 	"github.com/JuD4Mo/gopher-gains/internal/server"
@@ -10,7 +11,12 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func NewRouter(s *server.Server, itemCtrl *item.Controller) *chi.Mux {
+type Controllers struct {
+	ExerciseController *exercise.Controller
+	itemCtrl           *item.Controller
+}
+
+func NewRouter(s *server.Server, controllers Controllers) *chi.Mux {
 	r := chi.NewRouter()
 
 	globalMw := middleware.NewGlobalMiddlewares(s)
@@ -25,9 +31,16 @@ func NewRouter(s *server.Server, itemCtrl *item.Controller) *chi.Mux {
 	})
 
 	r.Route("/api/v1", func(r chi.Router) {
-		r.Mount("/items", itemRoutes(itemCtrl))
+		r.Mount("/items", itemRoutes(controllers.itemCtrl))
+		r.Mount("/exercise", exerciseRoutes(controllers.ExerciseController))
 	})
 
+	return r
+}
+
+func exerciseRoutes(ctrl *exercise.Controller) chi.Router {
+	r := chi.NewRouter()
+	r.Post("/create", ctrl.Create)
 	return r
 }
 
