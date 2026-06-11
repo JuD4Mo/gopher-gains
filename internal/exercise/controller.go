@@ -4,20 +4,33 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/JuD4Mo/gopher-gains/internal/errs"
+	"github.com/JuD4Mo/gopher-gains/internal/server"
+	"github.com/JuD4Mo/gopher-gains/pkg/meta"
 	"github.com/JuD4Mo/gopher-gains/pkg/sqlerr"
 	"github.com/JuD4Mo/gopher-gains/pkg/validation"
 	"github.com/rs/zerolog"
 )
 
-type Controller struct {
-	service Service
-}
+type (
+	Controller struct {
+		service Service
+		server  *server.Server
+	}
 
-func NewController(service Service) *Controller {
+	Response struct {
+		Status int         `json:"status"`
+		Data   interface{} `json:"data,omitempty"`
+		Meta   *meta.Meta  `json:"meta,omitempty"`
+	}
+)
+
+func NewController(service Service, server *server.Server) *Controller {
 	return &Controller{
 		service: service,
+		server:  server,
 	}
 }
 
@@ -38,7 +51,49 @@ func (c *Controller) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJSON(w, http.StatusCreated, exercise)
+	writeJSON(w, http.StatusCreated, &Response{
+		Status: http.StatusCreated,
+		Data:   exercise,
+	})
+}
+
+func (c *Controller) GetAll(w http.ResponseWriter, r *http.Request) {
+	queryParams := r.URL.Query()
+	order, _ := strconv.Atoi(queryParams.Get("order"))
+
+	filters := Filters{
+		Name:        queryParams.Get("name"),
+		MuscleGroup: queryParams.Get("muscleGroup"),
+		Order:       order,
+	}
+
+	limit, _ := strconv.Atoi(queryParams.Get("limit"))
+
+	page, _ := strconv.Atoi(queryParams.Get("page"))
+
+	count, err := c.service.Count(r.Context(), filters)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	meta, err := meta.New(*c.server.Config, page, limit, count)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	exercises, err := c.service.GetAllExercises(r.Context(), filters, meta.Limit(), meta.Offset())
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	writeJSON(w, http.StatusOK, &Response{
+		Status: http.StatusOK,
+		Data:   exercises,
+		Meta:   meta,
+	})
 }
 
 func writeJSON(w http.ResponseWriter, status int, data interface{}) {

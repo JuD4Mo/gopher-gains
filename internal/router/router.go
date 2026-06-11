@@ -41,6 +41,7 @@ func NewRouter(s *server.Server, controllers Controllers) *chi.Mux {
 func exerciseRoutes(ctrl *exercise.Controller) chi.Router {
 	r := chi.NewRouter()
 	r.Post("/create", ctrl.Create)
+	r.Get("/getAll", ctrl.GetAll)
 	return r
 }
 

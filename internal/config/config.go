@@ -12,9 +12,10 @@ import (
 )
 
 type Config struct {
-	Primary  Primary        `koanf:"primary" validate:"required"`
-	Server   ServerConfig   `koanf:"server" validate:"required"`
-	Database DatabaseConfig `koanf:"database" validate:"required"`
+	Primary    Primary           `koanf:"primary" validate:"required"`
+	Server     ServerConfig      `koanf:"server" validate:"required"`
+	Database   DatabaseConfig    `koanf:"database" validate:"required"`
+	Pagination PaginationDefault `koanf:"pagination" validate:"required"`
 }
 
 type Primary struct {
@@ -27,6 +28,10 @@ type ServerConfig struct {
 	WriteTimeout       int      `koanf:"write_timeout" validate:"required"`
 	IdleTimeout        int      `koanf:"idle_timeout" validate:"required"`
 	CORSAllowedOrigins []string `koanf:"cors_allowed_origins" validate:"required"`
+}
+
+type PaginationDefault struct {
+	PaginatorLimitDefault int `koanf:"paginator_limit_default" validate:"required"`
 }
 
 type DatabaseConfig struct {

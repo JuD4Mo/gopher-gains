@@ -36,7 +36,7 @@ func main() {
 
 	exerciseRepo := exercise.NewRepository(srv.DB.Pool)
 	exerciseService := exercise.NewService(exerciseRepo)
-	exerciseController := exercise.NewController(exerciseService)
+	exerciseController := exercise.NewController(exerciseService, srv)
 
 	controllers := router.Controllers{
 		ExerciseController: exerciseController,
