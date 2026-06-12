@@ -1,6 +1,12 @@
 package exercise
 
-import "context"
+import (
+	"context"
+	"errors"
+	"fmt"
+
+	"github.com/JuD4Mo/gopher-gains/internal/errs"
+)
 
 type service struct {
 	repo Repository
@@ -37,4 +43,20 @@ func (s *service) Count(ctx context.Context, filters Filters) (int, error) {
 	}
 
 	return numExercises, nil
+}
+
+func (s *service) GetExerciseById(ctx context.Context, id int) (*Exercise, error) {
+	exercise, err := s.repo.GetById(ctx, id)
+	if err != nil {
+		if errors.Is(err, ErrNotFound) {
+			return nil, errs.NewNotFoundError(
+				fmt.Sprintf("error! exercise with id: %d not found", id),
+				true,
+				nil,
+			)
+		}
+		return nil, err
+	}
+
+	return exercise, nil
 }

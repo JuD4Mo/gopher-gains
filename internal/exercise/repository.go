@@ -2,6 +2,7 @@ package exercise
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -44,12 +45,12 @@ func (r *repo) Create(ctx context.Context, createExerciseDto *CreateExerciseDto)
 		"muscleGroup":  createExerciseDto.TargetMuscleGroup,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("error inserting exercise: %v", err)
+		return nil, fmt.Errorf("error inserting exercise: %w", err)
 	}
 
 	exercise, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[Exercise])
 	if err != nil {
-		return nil, fmt.Errorf("error collecting row from table exercise: %v", err)
+		return nil, fmt.Errorf("error collecting row from table exercise: %w", err)
 	}
 
 	return &exercise, nil
@@ -75,11 +76,12 @@ func (r *repo) GetAll(ctx context.Context, filters Filters, limit, offset int) (
 		stmt += ` WHERE ` + strings.Join(conditions, " AND ")
 	}
 
-	if filters.Order == 1 {
+	switch filters.Order {
+	case 1:
 		stmt += " ORDER BY created_at ASC"
-	} else if filters.Order == 0 {
+	case 0:
 		stmt += " ORDER BY created_at DESC"
-	} else {
+	default:
 		return nil, fmt.Errorf("order type unrecognized")
 	}
 
@@ -89,15 +91,37 @@ func (r *repo) GetAll(ctx context.Context, filters Filters, limit, offset int) (
 
 	rows, err := r.pool.Query(ctx, stmt, args)
 	if err != nil {
-		return nil, fmt.Errorf("error executing GetAll query: %v", err)
+		return nil, fmt.Errorf("error executing GetAll query: %w", err)
 	}
 
 	exercises, err := pgx.CollectRows(rows, pgx.RowToStructByName[Exercise])
 	if err != nil {
-		return nil, fmt.Errorf("error collecting exercises: %v", err)
+		return nil, fmt.Errorf("error collecting exercises: %w", err)
 	}
 
 	return exercises, nil
+}
+
+func (r *repo) GetById(ctx context.Context, id int) (*Exercise, error) {
+	stmt := `
+		SELECT * FROM exercise
+		WHERE id = @id
+	`
+	var exercise Exercise
+	rows, err := r.pool.Query(ctx, stmt, pgx.NamedArgs{"id": id})
+	if err != nil {
+		return nil, fmt.Errorf("error executing GetById query: %w", err)
+	}
+
+	exercise, err = pgx.CollectOneRow(rows, pgx.RowToStructByName[Exercise])
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, fmt.Errorf("%w", ErrNotFound)
+		}
+		return nil, fmt.Errorf("error getting exercise: %w", err)
+	}
+
+	return &exercise, nil
 }
 
 func (r *repo) Count(ctx context.Context, filters Filters) (int, error) {

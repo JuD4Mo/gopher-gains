@@ -42,6 +42,7 @@ func exerciseRoutes(ctrl *exercise.Controller) chi.Router {
 	r := chi.NewRouter()
 	r.Post("/create", ctrl.Create)
 	r.Get("/getAll", ctrl.GetAll)
+	r.Get("/getById/{id}", ctrl.GetById)
 	return r
 }
 

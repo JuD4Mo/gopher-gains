@@ -11,6 +11,7 @@ import (
 	"github.com/JuD4Mo/gopher-gains/pkg/meta"
 	"github.com/JuD4Mo/gopher-gains/pkg/sqlerr"
 	"github.com/JuD4Mo/gopher-gains/pkg/validation"
+	"github.com/go-chi/chi/v5"
 	"github.com/rs/zerolog"
 )
 
@@ -93,6 +94,23 @@ func (c *Controller) GetAll(w http.ResponseWriter, r *http.Request) {
 		Status: http.StatusOK,
 		Data:   exercises,
 		Meta:   meta,
+	})
+}
+
+func (c *Controller) GetById(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+
+	idInt, _ := strconv.Atoi(id)
+
+	exercise, err := c.service.GetExerciseById(r.Context(), idInt)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	writeJSON(w, http.StatusOK, &Response{
+		Status: http.StatusOK,
+		Data:   exercise,
 	})
 }
 
