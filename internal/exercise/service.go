@@ -60,3 +60,18 @@ func (s *service) GetExerciseById(ctx context.Context, id int) (*Exercise, error
 
 	return exercise, nil
 }
+
+func (s *service) UpdateExercise(ctx context.Context, id int, updateExerciseDto *UpdateExerciseDto) (*Exercise, error) {
+	//check if the exercise exists
+	_, err := s.GetExerciseById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	exercise, err := s.repo.Update(ctx, id, updateExerciseDto)
+	if err != nil {
+		return nil, err
+	}
+
+	return exercise, nil
+}

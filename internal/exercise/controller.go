@@ -114,6 +114,30 @@ func (c *Controller) GetById(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func (c *Controller) Update(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+
+	idInt, _ := strconv.Atoi(id)
+
+	var updatedExercisedto UpdateExerciseDto
+	err := validation.BindAndValidate(r, &updatedExercisedto)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	updatedExercise, err := c.service.UpdateExercise(r.Context(), idInt, &updatedExercisedto)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	writeJSON(w, http.StatusCreated, &Response{
+		Status: http.StatusCreated,
+		Data:   updatedExercise,
+	})
+}
+
 func writeJSON(w http.ResponseWriter, status int, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)

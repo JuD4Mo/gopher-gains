@@ -124,6 +124,51 @@ func (r *repo) GetById(ctx context.Context, id int) (*Exercise, error) {
 	return &exercise, nil
 }
 
+func (r *repo) Update(ctx context.Context, id int, updateExerciseDto *UpdateExerciseDto) (*Exercise, error) {
+	stmt := `
+		UPDATE exercise
+		SET 
+	`
+	columns := []string{}
+	args := pgx.NamedArgs{}
+
+	if updateExerciseDto.Name != "" {
+		columns = append(columns, "name=@name")
+		args["name"] = updateExerciseDto.Name
+	}
+
+	if updateExerciseDto.Description != "" {
+		columns = append(columns, "description=@description")
+		args["description"] = updateExerciseDto.Description
+	}
+
+	if updateExerciseDto.ExecutionTip != "" {
+		columns = append(columns, "execution_tip=@executionTip")
+		args["executionTip"] = updateExerciseDto.ExecutionTip
+	}
+
+	if updateExerciseDto.TargetMuscleGroup != "" {
+		columns = append(columns, "target_muscle_group=@targetMuscleGroup")
+		args["targetMuscleGroup"] = updateExerciseDto.TargetMuscleGroup
+	}
+
+	stmt += strings.Join(columns, ",")
+	stmt += " WHERE id=@id RETURNING *"
+	args["id"] = id
+
+	rows, err := r.pool.Query(ctx, stmt, args)
+	if err != nil {
+		return nil, fmt.Errorf("error executing Update query: %w", err)
+	}
+
+	updatedExercise, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[Exercise])
+	if err != nil {
+		return nil, fmt.Errorf("error updating exercise: %w", err)
+	}
+
+	return &updatedExercise, nil
+}
+
 func (r *repo) Count(ctx context.Context, filters Filters) (int, error) {
 	args := pgx.NamedArgs{}
 	conditions := []string{}
