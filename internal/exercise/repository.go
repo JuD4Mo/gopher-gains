@@ -132,24 +132,24 @@ func (r *repo) Update(ctx context.Context, id int, updateExerciseDto *UpdateExer
 	columns := []string{}
 	args := pgx.NamedArgs{}
 
-	if updateExerciseDto.Name != "" {
+	if updateExerciseDto.Name != nil {
 		columns = append(columns, "name=@name")
-		args["name"] = updateExerciseDto.Name
+		args["name"] = *updateExerciseDto.Name
 	}
 
-	if updateExerciseDto.Description != "" {
+	if updateExerciseDto.Description != nil {
 		columns = append(columns, "description=@description")
-		args["description"] = updateExerciseDto.Description
+		args["description"] = *updateExerciseDto.Description
 	}
 
-	if updateExerciseDto.ExecutionTip != "" {
+	if updateExerciseDto.ExecutionTip != nil {
 		columns = append(columns, "execution_tip=@executionTip")
-		args["executionTip"] = updateExerciseDto.ExecutionTip
+		args["executionTip"] = *updateExerciseDto.ExecutionTip
 	}
 
-	if updateExerciseDto.TargetMuscleGroup != "" {
+	if updateExerciseDto.TargetMuscleGroup != nil {
 		columns = append(columns, "target_muscle_group=@targetMuscleGroup")
-		args["targetMuscleGroup"] = updateExerciseDto.TargetMuscleGroup
+		args["targetMuscleGroup"] = *updateExerciseDto.TargetMuscleGroup
 	}
 
 	stmt += strings.Join(columns, ",")
