@@ -12,6 +12,7 @@ import (
 	"github.com/JuD4Mo/gopher-gains/internal/database"
 	"github.com/JuD4Mo/gopher-gains/internal/exercise"
 	"github.com/JuD4Mo/gopher-gains/internal/router"
+	"github.com/JuD4Mo/gopher-gains/internal/routine"
 	"github.com/JuD4Mo/gopher-gains/internal/server"
 	"github.com/JuD4Mo/gopher-gains/pkg/logger"
 )
@@ -38,8 +39,13 @@ func main() {
 	exerciseService := exercise.NewService(exerciseRepo)
 	exerciseController := exercise.NewController(exerciseService, srv)
 
+	routineRepo := routine.NewRepository(srv.DB.Pool)
+	routineService := routine.NewService(routineRepo)
+	routineController := routine.NewController(routineService, srv)
+
 	controllers := router.Controllers{
 		ExerciseController: exerciseController,
+		RoutineController:  routineController,
 	}
 
 	r := router.NewRouter(srv, controllers)
