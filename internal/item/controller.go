@@ -52,7 +52,7 @@ func (h *Controller) Create(w http.ResponseWriter, r *http.Request) {
 func (h *Controller) GetByID(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
-		writeError(w, errs.NewBadRequestError("id is required", false, nil, nil, nil))
+		writeError(w, errs.NewBadRequestError("id is required", false, nil, nil))
 		return
 	}
 

@@ -1,32 +1,46 @@
 package meta
 
-import "math"
+import (
+	"github.com/JuD4Mo/gopher-gains/internal/config"
+)
 
 type Meta struct {
 	Page       int `json:"page"`
-	Limit      int `json:"limit"`
-	TotalItems int `json:"total_items"`
-	TotalPages int `json:"total_pages"`
+	PerPage    int `json:"per_page"`
+	PageCount  int `json:"page_count"`
+	TotalCount int `json:"total_count"`
 }
 
-func New(page, limit, totalItems int) (*Meta, error) {
-	if limit <= 0 {
-		limit = 10
+func New(cfg config.Config, page, perPage, total int) (*Meta, error) {
+
+	if perPage <= 0 {
+		perPage = cfg.Pagination.PaginatorLimitDefault
 	}
-	if page <= 0 {
+
+	pageCount := 0
+	if total >= 0 {
+		pageCount = (total + perPage - 1) / perPage
+		if page > pageCount {
+			page = pageCount
+		}
+	}
+
+	if page < 1 {
 		page = 1
 	}
 
-	totalPages := int(math.Ceil(float64(totalItems) / float64(limit)))
-
 	return &Meta{
 		Page:       page,
-		Limit:      limit,
-		TotalItems: totalItems,
-		TotalPages: totalPages,
+		PerPage:    perPage,
+		PageCount:  pageCount,
+		TotalCount: total,
 	}, nil
 }
 
-func (m *Meta) Offset() int {
-	return (m.Page - 1) * m.Limit
+func (p *Meta) Offset() int {
+	return (p.Page - 1) * p.PerPage
+}
+
+func (p *Meta) Limit() int {
+	return p.PerPage
 }

@@ -9,25 +9,12 @@ type FieldError struct {
 	Error string `json:"error"`
 }
 
-type ActionType string
-
-const (
-	ActionTypeRedirect ActionType = "redirect"
-)
-
-type Action struct {
-	Type    ActionType `json:"type"`
-	Message string     `json:"message"`
-	Value   string     `json:"value"`
-}
-
 type HTTPError struct {
 	Code     string       `json:"code"`
 	Message  string       `json:"message"`
 	Status   int          `json:"status"`
 	Override bool         `json:"override"`
 	Errors   []FieldError `json:"errors"`
-	Action   *Action      `json:"action"`
 }
 
 func (e *HTTPError) Error() string {
@@ -46,7 +33,6 @@ func (e *HTTPError) WithMessage(message string) *HTTPError {
 		Status:   e.Status,
 		Override: e.Override,
 		Errors:   e.Errors,
-		Action:   e.Action,
 	}
 }
 
