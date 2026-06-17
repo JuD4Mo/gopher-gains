@@ -11,9 +11,14 @@ import (
 	"github.com/JuD4Mo/gopher-gains/internal/config"
 	"github.com/JuD4Mo/gopher-gains/internal/database"
 	"github.com/JuD4Mo/gopher-gains/internal/exercise"
+	"github.com/JuD4Mo/gopher-gains/internal/exerciseset"
 	"github.com/JuD4Mo/gopher-gains/internal/router"
 	"github.com/JuD4Mo/gopher-gains/internal/routine"
+	"github.com/JuD4Mo/gopher-gains/internal/routineexercise"
 	"github.com/JuD4Mo/gopher-gains/internal/server"
+	"github.com/JuD4Mo/gopher-gains/internal/user"
+	"github.com/JuD4Mo/gopher-gains/internal/userroutine"
+	"github.com/JuD4Mo/gopher-gains/internal/workoutsession"
 	"github.com/JuD4Mo/gopher-gains/pkg/logger"
 )
 
@@ -43,9 +48,34 @@ func main() {
 	routineService := routine.NewService(routineRepo)
 	routineController := routine.NewController(routineService, srv)
 
+	userRepo := user.NewRepository(srv.DB.Pool)
+	userService := user.NewService(userRepo)
+	userController := user.NewController(userService, srv)
+
+	sessionRepo := workoutsession.NewRepository(srv.DB.Pool)
+	sessionService := workoutsession.NewService(sessionRepo)
+	sessionController := workoutsession.NewController(sessionService, srv)
+
+	setRepo := exerciseset.NewRepository(srv.DB.Pool)
+	setService := exerciseset.NewService(setRepo)
+	setController := exerciseset.NewController(setService, srv)
+
+	userRoutineRepo := userroutine.NewRepository(srv.DB.Pool)
+	userRoutineService := userroutine.NewService(userRoutineRepo)
+	userRoutineController := userroutine.NewController(userRoutineService)
+
+	routineExerciseRepo := routineexercise.NewRepository(srv.DB.Pool)
+	routineExerciseService := routineexercise.NewService(routineExerciseRepo)
+	routineExerciseController := routineexercise.NewController(routineExerciseService)
+
 	controllers := router.Controllers{
-		ExerciseController: exerciseController,
-		RoutineController:  routineController,
+		ExerciseController:   exerciseController,
+		RoutineController:    routineController,
+		UserController:       userController,
+		SessionController:    sessionController,
+		ExerciseSetController: setController,
+		UserRoutineController: userRoutineController,
+		RoutineExerciseController: routineExerciseController,
 	}
 
 	r := router.NewRouter(srv, controllers)
