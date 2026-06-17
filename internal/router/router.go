@@ -5,7 +5,6 @@ import (
 
 	"github.com/JuD4Mo/gopher-gains/internal/exercise"
 	"github.com/JuD4Mo/gopher-gains/internal/exerciseset"
-	"github.com/JuD4Mo/gopher-gains/internal/item"
 	"github.com/JuD4Mo/gopher-gains/internal/middleware"
 	"github.com/JuD4Mo/gopher-gains/internal/routine"
 	"github.com/JuD4Mo/gopher-gains/internal/routineexercise"
@@ -18,14 +17,13 @@ import (
 )
 
 type Controllers struct {
-	ExerciseController   *exercise.Controller
-	RoutineController    *routine.Controller
-	UserController       *user.Controller
-	SessionController    *workoutsession.Controller
-	ExerciseSetController *exerciseset.Controller
-	UserRoutineController *userroutine.Controller
+	ExerciseController        *exercise.Controller
+	RoutineController         *routine.Controller
+	UserController            *user.Controller
+	SessionController         *workoutsession.Controller
+	ExerciseSetController     *exerciseset.Controller
+	UserRoutineController     *userroutine.Controller
 	RoutineExerciseController *routineexercise.Controller
-	itemCtrl             *item.Controller
 }
 
 func NewRouter(s *server.Server, controllers Controllers) *chi.Mux {
@@ -43,7 +41,6 @@ func NewRouter(s *server.Server, controllers Controllers) *chi.Mux {
 	})
 
 	r.Route("/api/v1", func(r chi.Router) {
-		r.Mount("/items", itemRoutes(controllers.itemCtrl))
 		r.Mount("/exercise", exerciseRoutes(controllers.ExerciseController))
 		r.Mount("/routine", routineRoutes(controllers.RoutineController))
 		r.Mount("/users", userRoutes(controllers.UserController))
@@ -115,12 +112,5 @@ func routineExerciseRoutes(ctrl *routineexercise.Controller) chi.Router {
 	r.Get("/byRoutine/{routineId}", ctrl.GetByRoutine)
 	r.Patch("/updateStep/{routineId}/{exerciseId}", ctrl.UpdateStep)
 	r.Delete("/remove/{routineId}/{exerciseId}", ctrl.RemoveExercise)
-	return r
-}
-
-func itemRoutes(ctrl *item.Controller) chi.Router {
-	r := chi.NewRouter()
-	r.Post("/", ctrl.Create)
-	r.Get("/{id}", ctrl.GetByID)
 	return r
 }
