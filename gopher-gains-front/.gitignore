@@ -46,3 +46,4 @@ Thumbs.db
 # Generated
 src/environments/
 .env
+.impeccable/
