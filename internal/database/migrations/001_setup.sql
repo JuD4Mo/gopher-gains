@@ -63,6 +63,7 @@ CREATE TABLE routine_exercise (
     routine_id INT REFERENCES routine(id) ON DELETE CASCADE,
     exercise_id INT REFERENCES exercise(id) ON DELETE CASCADE,
     step_number INT NOT NULL,
+    assigned_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (routine_id, exercise_id)
 );
 
