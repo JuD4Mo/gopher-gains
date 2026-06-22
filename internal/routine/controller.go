@@ -79,7 +79,7 @@ func (c *Controller) GetAll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	routines, err := c.service.GetAllRoutines(r.Context(), filters, limit, meta.Offset())
+	routines, err := c.service.GetAllRoutines(r.Context(), filters, meta.PerPage, meta.Offset())
 	if err != nil {
 		writeError(w, err)
 		return
