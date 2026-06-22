@@ -6,6 +6,7 @@ type (
 	CreateExerciseSetDto struct {
 		WsessionId  int     `json:"wsessionId" validate:"required"`
 		ExerciseId  int     `json:"exerciseId" validate:"required"`
+		StepNumber  int     `json:"stepNumber" validate:"required"`
 		Weight      float64 `json:"weight" validate:"required"`
 		Repetitions int     `json:"repetitions" validate:"required"`
 		Rir         *int    `json:"rir" validate:"omitempty,min=0,max=10"`
@@ -15,6 +16,7 @@ type (
 		Weight      *float64 `json:"weight" validate:"omitempty"`
 		Repetitions *int     `json:"repetitions" validate:"omitempty"`
 		Rir         *int     `json:"rir" validate:"omitempty,min=0,max=10"`
+		StepNumber  *int     `json:"stepNumber" validate:"omitempty"`
 	}
 )
 
@@ -23,7 +25,7 @@ func (c *CreateExerciseSetDto) Validate() error {
 }
 
 func (c *UpdateExerciseSetDto) Validate() error {
-	if c.Weight == nil && c.Repetitions == nil && c.Rir == nil {
+	if c.Weight == nil && c.Repetitions == nil && c.Rir == nil && c.StepNumber == nil {
 		return validation.CustomValidationErrors{
 			{Field: "body", Message: "at least one field must be provided for update"},
 		}

@@ -25,6 +25,7 @@ func (r *repo) Create(ctx context.Context, createDto *CreateExerciseSetDto) (*Ex
 		INSERT INTO exercise_set (
 			wsession_id,
 			exercise_id,
+			step_number,
 			weight,
 			repetitions,
 			rir
@@ -32,6 +33,7 @@ func (r *repo) Create(ctx context.Context, createDto *CreateExerciseSetDto) (*Ex
 		VALUES (
 			@wsessionId,
 			@exerciseId,
+			@stepNumber,
 			@weight,
 			@repetitions,
 			@rir
@@ -42,6 +44,7 @@ func (r *repo) Create(ctx context.Context, createDto *CreateExerciseSetDto) (*Ex
 	args := pgx.NamedArgs{
 		"wsessionId":  createDto.WsessionId,
 		"exerciseId":  createDto.ExerciseId,
+		"stepNumber":  createDto.StepNumber,
 		"weight":      createDto.Weight,
 		"repetitions": createDto.Repetitions,
 	}
@@ -154,6 +157,11 @@ func (r *repo) Update(ctx context.Context, id int, updateDto *UpdateExerciseSetD
 	if updateDto.Rir != nil {
 		columns = append(columns, "rir=@rir")
 		args["rir"] = *updateDto.Rir
+	}
+
+	if updateDto.StepNumber != nil {
+		columns = append(columns, "step_number=@stepNumber")
+		args["stepNumber"] = *updateDto.StepNumber
 	}
 
 	stmt += strings.Join(columns, ",")
