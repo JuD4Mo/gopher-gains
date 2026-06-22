@@ -7,8 +7,6 @@ export interface WorkoutSession {
   endTime: string | null;
   status: SessionStatus;
   observations: string | null;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface CreateWorkoutSessionDto {

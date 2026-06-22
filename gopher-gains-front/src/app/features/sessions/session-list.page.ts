@@ -107,7 +107,7 @@ export class SessionListPage implements OnInit {
     this.loading.set(true); this.error.set(null);
     this.sessionService.getAll({ status: this.statusFilter || undefined, page: this.currentPage }).subscribe({
       next: (res) => { this.sessions.set(res.data); if (res.meta) this.pagination.set(res.meta); this.loading.set(false); },
-      error: (err) => { this.error.set(err.message); this.loading.set(false); },
+      error: (err) => { this.error.set(err.error?.message ?? err.message); this.loading.set(false); },
     });
   }
   protected onFilterChange() { this.currentPage = 1; this.load(); }

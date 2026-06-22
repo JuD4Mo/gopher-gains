@@ -35,7 +35,7 @@ import { ICONS } from '../../shared/icons';
                 >
                   <option value="0" disabled>Select user</option>
                   @for (u of users(); track u.id) {
-                    <option [value]="u.id">{{ u.name }} {{ u.lastName }}</option>
+                    <option [ngValue]="u.id">{{ u.name }} {{ u.lastName }}</option>
                   }
                 </select>
               </div>
@@ -47,7 +47,7 @@ import { ICONS } from '../../shared/icons';
                 >
                   <option value="0" disabled>Select routine</option>
                   @for (r of routines(); track r.id) {
-                    <option [value]="r.id">{{ r.name }}</option>
+                    <option [ngValue]="r.id">{{ r.name }}</option>
                   }
                 </select>
               </div>
@@ -168,7 +168,7 @@ export class AssignmentPage implements OnInit {
         this.submitting.set(false);
       },
       error: (err) => {
-        this.error.set(err.message);
+        this.error.set(err.error?.message ?? err.message);
         this.submitting.set(false);
       },
     });

@@ -160,7 +160,7 @@ import type { Routine } from '../../models/routine.model';
                     <a [routerLink]="'/sessions/' + s.id" class="flex items-center justify-between p-3 rounded-lg hover:bg-surface-light transition-colors group">
                       <div>
                         <p class="text-sm font-medium text-text">{{ s.observations || 'Workout session' }}</p>
-                        <p class="text-xs text-text-muted mt-0.5">{{ s.createdAt | date:'MMM d, yyyy' }}</p>
+                        <p class="text-xs text-text-muted mt-0.5">{{ s.startTime | date:'MMM d, yyyy' }}</p>
                       </div>
                       <span class="w-4 h-4 text-text-muted group-hover:text-accent transition-colors [&>svg]:w-full [&>svg]:h-full" [innerHTML]="icons.chevronRight | safeHtml"></span>
                     </a>

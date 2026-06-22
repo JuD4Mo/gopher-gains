@@ -103,7 +103,7 @@ export class ExerciseFormPage implements OnInit {
       this.isEdit.set(true);
       this.exerciseService.getById(this.editId).subscribe({
         next: (res) => { this.form = { name: res.data.name, description: res.data.description, executionTip: res.data.executionTip, muscleGroup: res.data.muscleGroup }; },
-        error: (err) => this.error.set(err.message ?? 'Failed to load exercise'),
+        error: (err) => this.error.set(err.error?.message ?? err.message ?? 'Failed to load exercise'),
       });
     }
   }
@@ -120,7 +120,7 @@ export class ExerciseFormPage implements OnInit {
       : this.exerciseService.create(this.form);
     request.subscribe({
       next: () => { this.toast.show(this.isEdit() ? 'Exercise updated' : 'Exercise created'); this.router.navigate(['/exercises']); },
-      error: (err) => { this.error.set(err.message ?? 'Failed to save exercise'); this.submitting.set(false); },
+      error: (err) => { this.error.set(err.error?.message ?? err.message ?? 'Failed to save exercise'); this.submitting.set(false); },
     });
   }
 }

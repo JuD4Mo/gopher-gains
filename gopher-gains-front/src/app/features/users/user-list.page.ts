@@ -88,7 +88,7 @@ export class UserListPage implements OnInit {
     this.loading.set(true); this.error.set(null);
     this.userService.getAll({ name: this.nameFilter || undefined, page: this.currentPage }).subscribe({
       next: (res) => { this.users.set(res.data); if (res.meta) this.pagination.set(res.meta); this.loading.set(false); },
-      error: (err) => { this.error.set(err.message); this.loading.set(false); },
+      error: (err) => { this.error.set(err.error?.message ?? err.message); this.loading.set(false); },
     });
   }
   protected onFilterChange() { this.currentPage = 1; this.load(); }

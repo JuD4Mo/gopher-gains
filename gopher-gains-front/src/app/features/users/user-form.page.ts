@@ -77,7 +77,7 @@ export class UserFormPage implements OnInit {
       this.editId = Number(id); this.isEdit.set(true);
       this.userService.getById(this.editId).subscribe({
         next: (res) => { this.form = { name: res.data.name, lastName: res.data.lastName, email: res.data.email, password: '' }; },
-        error: (err) => this.error.set(err.message),
+        error: (err) => this.error.set(err.error?.message ?? err.message),
       });
     }
   }
@@ -91,7 +91,7 @@ export class UserFormPage implements OnInit {
       : this.userService.create(this.form);
     request.subscribe({
       next: () => { this.toast.show(this.isEdit() ? 'User updated' : 'User created'); this.router.navigate(['/users']); },
-      error: (err) => { this.error.set(err.message); this.submitting.set(false); },
+      error: (err) => { this.error.set(err.error?.message ?? err.message); this.submitting.set(false); },
     });
   }
 }

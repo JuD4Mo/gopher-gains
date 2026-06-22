@@ -81,7 +81,7 @@ import { ICONS } from '../../shared/icons';
                       <select [(ngModel)]="newExerciseId" class="w-full px-3 py-2 text-sm border border-border rounded-lg bg-card focus:border-accent/30 focus:ring-2 focus:ring-accent/10 transition-all outline-none">
                         <option value="0" disabled>Select exercise</option>
                         @for (ex of availableExercises(); track ex.id) {
-                          <option [value]="ex.id">{{ ex.name }} ({{ ex.muscleGroup }})</option>
+                          <option [ngValue]="ex.id">{{ ex.name }} ({{ ex.muscleGroup }})</option>
                         }
                       </select>
                     </div>
@@ -167,7 +167,7 @@ export class RoutineDetailPage implements OnInit {
     if (!this.newExerciseId) return;
     this.routineExerciseService.addExercise({ routineId: this.routineId, exerciseId: this.newExerciseId, stepNumber: this.newStepNumber }).subscribe({
       next: () => { this.showAddForm.set(false); this.newExerciseId = 0; this.load(); },
-      error: (err) => this.exercisesError.set(err.message),
+      error: (err) => this.exercisesError.set(err.error?.message ?? err.message),
     });
   }
 
@@ -183,7 +183,7 @@ export class RoutineDetailPage implements OnInit {
       message: 'Are you sure you want to remove this exercise from the routine?',
       confirmText: 'Remove',
       onConfirm: () => {
-        this.routineExerciseService.remove(this.routineId, exerciseId).subscribe({ next: () => this.load(), error: (err) => this.exercisesError.set(err.message) });
+        this.routineExerciseService.remove(this.routineId, exerciseId).subscribe({ next: () => this.load(), error: (err) => this.exercisesError.set(err.error?.message ?? err.message) });
       },
     });
   }

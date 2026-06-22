@@ -72,7 +72,7 @@ export class RoutineEditPage implements OnInit {
     if (this.routineId) {
       this.routineService.getById(this.routineId).subscribe({
         next: (res) => { this.form = { name: res.data.name, description: res.data.description, frequency: res.data.frequency, type: res.data.type }; },
-        error: (err) => this.error.set(err.message),
+        error: (err) => this.error.set(err.error?.message ?? err.message),
       });
     }
   }
@@ -80,8 +80,8 @@ export class RoutineEditPage implements OnInit {
   protected onSubmit() {
     this.submitting.set(true); this.error.set(null);
     this.routineService.update(this.routineId, this.form).subscribe({
-      next: () => { this.toast.show('Routine updated'); this.router.navigate(['/routines', this.routineId]); },
-      error: (err) => { this.error.set(err.message); this.submitting.set(false); },
+      next: () => { this.toast.show('Routine updated'); this.router.navigate(['/routines']); },
+      error: (err) => { this.error.set(err.error?.message ?? err.message); this.submitting.set(false); },
     });
   }
 }

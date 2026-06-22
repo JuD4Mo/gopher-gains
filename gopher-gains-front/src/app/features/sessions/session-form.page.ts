@@ -34,7 +34,7 @@ import { ICONS } from '../../shared/icons';
             <select [(ngModel)]="userId" name="userId" required class="w-full px-3.5 py-2.5 text-sm border border-border rounded-lg bg-surface-light focus:bg-card focus:border-accent/30 focus:ring-2 focus:ring-accent/10 transition-all outline-none">
               <option value="0" disabled>Select a user</option>
               @for (u of users(); track u.id) {
-                <option [value]="u.id">{{ u.name }} {{ u.lastName }} ({{ u.email }})</option>
+                <option [ngValue]="u.id">{{ u.name }} {{ u.lastName }} ({{ u.email }})</option>
               }
             </select>
           </div>
@@ -76,7 +76,7 @@ export class SessionFormPage implements OnInit {
     this.submitting.set(true); this.error.set(null);
     this.sessionService.create({ userId: this.userId, observations: this.observations || undefined }).subscribe({
       next: (res) => { this.toast.show('Session started'); this.router.navigate(['/sessions', res.data.id]); },
-      error: (err) => { this.error.set(err.message); this.submitting.set(false); },
+      error: (err) => { this.error.set(err.error?.message ?? err.message); this.submitting.set(false); },
     });
   }
 }

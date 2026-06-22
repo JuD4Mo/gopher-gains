@@ -136,7 +136,7 @@ export class ExerciseListPage implements OnInit {
         if (res.meta) this.pagination.set(res.meta);
         this.loading.set(false);
       },
-      error: (err) => { this.error.set(err.message ?? 'Failed to load exercises'); this.loading.set(false); },
+      error: (err) => { this.error.set(err.error?.message ?? err.message ?? 'Failed to load exercises'); this.loading.set(false); },
     });
   }
 

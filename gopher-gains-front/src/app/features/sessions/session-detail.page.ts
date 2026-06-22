@@ -85,7 +85,7 @@ import { ICONS } from '../../shared/icons';
                         <select [(ngModel)]="newSet.exerciseId" class="w-full px-3 py-2 text-sm border border-border rounded-lg bg-card focus:border-accent/30 focus:ring-2 focus:ring-accent/10 transition-all outline-none">
                           <option value="0" disabled>Select exercise</option>
                           @for (ex of exercises(); track ex.id) {
-                            <option [value]="ex.id">{{ ex.name }}</option>
+                            <option [ngValue]="ex.id">{{ ex.name }}</option>
                           }
                         </select>
                       </div>
@@ -200,14 +200,14 @@ export class SessionDetailPage implements OnInit {
     this.setError.set(null);
     this.exerciseSetService.create({ wsessionId: this.sessionId, ...this.newSet }).subscribe({
       next: () => { this.showAddForm.set(false); this.newSet = { exerciseId: 0, weight: 0, repetitions: 0, rir: 3 }; this.loadSets(); },
-      error: (err) => this.setError.set(err.message),
+      error: (err) => this.setError.set(err.error?.message ?? err.message),
     });
   }
 
   protected finishSession() {
     this.sessionService.update(this.sessionId, { status: 'finished', endTime: new Date().toISOString() }).subscribe({
       next: () => { this.toast.show('Session finished'); this.load(); },
-      error: (err) => this.setError.set(err.message),
+      error: (err) => this.setError.set(err.error?.message ?? err.message),
     });
   }
 }
