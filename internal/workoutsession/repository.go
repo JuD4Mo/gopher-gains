@@ -71,9 +71,9 @@ func (r *repo) GetAll(ctx context.Context, filters Filters, limit, offset int) (
 
 	switch filters.Order {
 	case 1:
-		stmt += " ORDER BY created_at ASC"
+		stmt += " ORDER BY start_time ASC"
 	case 0:
-		stmt += " ORDER BY created_at DESC"
+		stmt += " ORDER BY start_time DESC"
 	default:
 		return nil, fmt.Errorf("order type unrecognized")
 	}

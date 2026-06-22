@@ -12,6 +12,7 @@ import (
 	"github.com/JuD4Mo/gopher-gains/pkg/sqlerr"
 	"github.com/JuD4Mo/gopher-gains/pkg/validation"
 	"github.com/go-chi/chi/v5"
+	"github.com/rs/zerolog"
 )
 
 type (
@@ -27,6 +28,8 @@ type (
 	}
 )
 
+var logger *zerolog.Logger
+
 func NewController(service Service, server *server.Server) *Controller {
 	return &Controller{
 		service: service,
@@ -35,10 +38,13 @@ func NewController(service Service, server *server.Server) *Controller {
 }
 
 func (c *Controller) Create(w http.ResponseWriter, r *http.Request) {
+	logger = zerolog.Ctx(r.Context())
+
 	var createDto CreateExerciseSetDto
 
 	err := validation.BindAndValidate(r, &createDto)
 	if err != nil {
+		logger.Error().Err(err).Msg("failed to create")
 		writeError(w, err)
 		return
 	}
