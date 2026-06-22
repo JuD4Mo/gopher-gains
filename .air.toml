@@ -11,6 +11,8 @@ tmp_dir = "tmp"
   exclude_dir = ["tmp", "vendor", "gopher-gains-front"]
   exclude_regex = ["_test\\.go"]
   exclude_unchanged = true
+  poll = true
+  poll_interval = 500
 
 [color]
   app = ""
