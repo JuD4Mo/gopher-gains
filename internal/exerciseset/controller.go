@@ -140,6 +140,25 @@ func (c *Controller) Update(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func (c *Controller) GetProgressSet(w http.ResponseWriter, r *http.Request) {
+	queryParams := r.URL.Query()
+
+	exerciseId, _ := strconv.Atoi(queryParams.Get("exerciseId"))
+	step, _ := strconv.Atoi(queryParams.Get("step"))
+	sdate := queryParams.Get("specificDate")
+
+	progress, err := c.service.GetSetProgress(r.Context(), exerciseId, step, sdate)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	writeJSON(w, http.StatusOK, &Response{
+		Status: http.StatusOK,
+		Data:   progress,
+	})
+}
+
 func writeJSON(w http.ResponseWriter, status int, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)

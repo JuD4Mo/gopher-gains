@@ -6,15 +6,18 @@ import (
 	"fmt"
 
 	"github.com/JuD4Mo/gopher-gains/internal/errs"
+	"github.com/JuD4Mo/gopher-gains/internal/exercise"
 )
 
 type service struct {
-	repo Repository
+	repo            Repository
+	exerciseService exercise.Service
 }
 
-func NewService(repo Repository) Service {
+func NewService(repo Repository, exerciseService exercise.Service) Service {
 	return &service{
-		repo: repo,
+		repo:            repo,
+		exerciseService: exerciseService,
 	}
 }
 
@@ -64,6 +67,21 @@ func (s *service) UpdateSet(ctx context.Context, id int, updateDto *UpdateExerci
 	}
 
 	return set, nil
+}
+
+func (s *service) GetSetProgress(ctx context.Context, exerciseId int, step int, specificDate string) (*SetProgressResponseDto, error) {
+	//validate exercise
+	_, err := s.exerciseService.GetExerciseById(ctx, exerciseId)
+	if err != nil {
+		return nil, err
+	}
+
+	progress, err := s.repo.GetSetProgress(ctx, exerciseId, step, specificDate)
+	if err != nil {
+		return nil, err
+	}
+
+	return progress, nil
 }
 
 func (s *service) Count(ctx context.Context, filters Filters) (int, error) {
