@@ -138,6 +138,22 @@ func (c *Controller) Update(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func (c *Controller) GetExercise1RM(w http.ResponseWriter, r *http.Request) {
+	exerciseId := chi.URLParam(r, "exerciseId")
+	parsedId, _ := strconv.Atoi(exerciseId)
+
+	oneRM, err := c.service.GetExercise1RM(r.Context(), parsedId)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	writeJSON(w, http.StatusOK, &Response{
+		Status: http.StatusOK,
+		Data:   oneRM,
+	})
+}
+
 func writeJSON(w http.ResponseWriter, status int, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)

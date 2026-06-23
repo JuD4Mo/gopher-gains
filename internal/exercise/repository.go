@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"strings"
 
 	"github.com/jackc/pgx/v5"
@@ -167,6 +168,35 @@ func (r *repo) Update(ctx context.Context, id int, updateExerciseDto *UpdateExer
 	}
 
 	return &updatedExercise, nil
+}
+
+func (r *repo) GetExercise1RM(ctx context.Context, exerciseId int) (float64, error) {
+	stmt := `
+			SELECT ((max_epley + max_brzycki) / 2.0) as onerm FROM 
+		(SELECT
+				MAX(es.weight * (1 + es.repetitions / 30.0)) AS max_epley,
+				MAX(es.weight / (1.0278 - (0.0278 * es.repetitions))) AS max_brzycki
+		FROM exercise_set es
+		JOIN workout_session ws ON ws.id = es.wsession_id
+		WHERE es.exercise_id = @exerciseId
+			AND ws.start_time::date = (
+					SELECT ws.start_time::date
+					FROM workout_session ws
+					JOIN exercise_set es ON ws.id = es.wsession_id
+					WHERE es.exercise_id = @exerciseId
+					ORDER BY ws.start_time DESC
+					LIMIT 1
+		))
+	`
+	var oneRM float64
+	err := r.pool.QueryRow(ctx, stmt, pgx.NamedArgs{
+		"exerciseId": exerciseId,
+	}).Scan(&oneRM)
+	if err != nil {
+		return 0, fmt.Errorf("error executing 1RM: %w", err)
+	}
+
+	return math.Round((oneRM * 100)) / 100, nil
 }
 
 func (r *repo) Count(ctx context.Context, filters Filters) (int, error) {
