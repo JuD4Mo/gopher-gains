@@ -25,6 +25,7 @@ func (r *repo) Create(ctx context.Context, createDto *CreateExerciseSetDto) (*Ex
 		INSERT INTO exercise_set (
 			wsession_id,
 			exercise_id,
+			step_number,
 			weight,
 			repetitions,
 			rir
@@ -32,6 +33,7 @@ func (r *repo) Create(ctx context.Context, createDto *CreateExerciseSetDto) (*Ex
 		VALUES (
 			@wsessionId,
 			@exerciseId,
+			@stepNumber,
 			@weight,
 			@repetitions,
 			@rir
@@ -42,6 +44,7 @@ func (r *repo) Create(ctx context.Context, createDto *CreateExerciseSetDto) (*Ex
 	args := pgx.NamedArgs{
 		"wsessionId":  createDto.WsessionId,
 		"exerciseId":  createDto.ExerciseId,
+		"stepNumber":  createDto.StepNumber,
 		"weight":      createDto.Weight,
 		"repetitions": createDto.Repetitions,
 	}
@@ -156,6 +159,11 @@ func (r *repo) Update(ctx context.Context, id int, updateDto *UpdateExerciseSetD
 		args["rir"] = *updateDto.Rir
 	}
 
+	if updateDto.StepNumber != nil {
+		columns = append(columns, "step_number=@stepNumber")
+		args["stepNumber"] = *updateDto.StepNumber
+	}
+
 	stmt += strings.Join(columns, ",")
 	stmt += " WHERE id=@id RETURNING *"
 	args["id"] = id
@@ -171,6 +179,56 @@ func (r *repo) Update(ctx context.Context, id int, updateDto *UpdateExerciseSetD
 	}
 
 	return &updatedSet, nil
+}
+
+func (r *repo) GetSetProgress(ctx context.Context, exerciseId int, step int, specificDate string) (*SetProgressResponseDto, error) {
+	stmt := `
+		WITH exercise_progress AS (
+				SELECT
+						ws.start_time as start_time,
+						es.weight,
+						es.repetitions,
+						LAG(es.weight) OVER (ORDER BY ws.start_time) AS prev_weight,
+						LAG(es.repetitions) OVER (ORDER BY ws.start_time) AS prev_reps
+				FROM workout_session ws
+				JOIN exercise_set es ON ws.id = es.wsession_id
+				JOIN exercise e ON es.exercise_id = e.id
+				WHERE e.id = @exerciseId
+					AND es.step_number = @step
+				order by ws.start_time desc
+		)
+		SELECT
+				*,
+				CASE
+						WHEN prev_weight IS NULL THEN NULL
+						WHEN repetitions = prev_reps THEN
+								(weight - prev_weight) * 100 / prev_weight
+						WHEN weight = prev_weight THEN
+								(repetitions - prev_reps) * 100 / prev_reps
+						ELSE
+								((weight * repetitions) - (prev_weight * prev_reps))
+								* 100
+								/ (prev_weight * prev_reps)
+				END AS progress_pct
+		FROM exercise_progress
+		where start_time::date = @specificDate;
+	`
+
+	rows, err := r.pool.Query(ctx, stmt, pgx.NamedArgs{
+		"exerciseId":   exerciseId,
+		"step":         step,
+		"specificDate": specificDate,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("error executing previous set progress: %w", err)
+	}
+
+	progress, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[SetProgressResponseDto])
+	if err != nil {
+		return nil, fmt.Errorf("error collecting progress row: %w", err)
+	}
+
+	return &progress, nil
 }
 
 func (r *repo) Count(ctx context.Context, filters Filters) (int, error) {

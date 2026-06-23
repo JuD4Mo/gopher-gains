@@ -61,6 +61,21 @@ func (s *service) GetExerciseById(ctx context.Context, id int) (*Exercise, error
 	return exercise, nil
 }
 
+func (s *service) GetExercise1RM(ctx context.Context, exerciseId int) (float64, error) {
+	//check if the exercise exists
+	_, err := s.GetExerciseById(ctx, exerciseId)
+	if err != nil {
+		return 0, err
+	}
+
+	oneRM, err := s.repo.GetExercise1RM(ctx, exerciseId)
+	if err != nil {
+		return 0, err
+	}
+
+	return oneRM, nil
+}
+
 func (s *service) UpdateExercise(ctx context.Context, id int, updateExerciseDto *UpdateExerciseDto) (*Exercise, error) {
 	//check if the exercise exists
 	_, err := s.GetExerciseById(ctx, id)

@@ -8,9 +8,11 @@ tmp_dir = "tmp"
   cmd = "go build -o ./tmp/api ./cmd/api"
   entrypoint = ["./tmp/api"]
   include_ext = ["go"]
-  exclude_dir = ["tmp", "vendor"]
+  exclude_dir = ["tmp", "vendor", "gopher-gains-front"]
   exclude_regex = ["_test\\.go"]
   exclude_unchanged = true
+  poll = true
+  poll_interval = 500
 
 [color]
   app = ""

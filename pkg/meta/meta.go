@@ -6,9 +6,9 @@ import (
 
 type Meta struct {
 	Page       int `json:"page"`
-	PerPage    int `json:"per_page"`
-	PageCount  int `json:"page_count"`
-	TotalCount int `json:"total_count"`
+	PerPage    int `json:"perPage"`
+	PageCount  int `json:"pageCount"`
+	TotalCount int `json:"totalCount"`
 }
 
 func New(cfg config.Config, page, perPage, total int) (*Meta, error) {

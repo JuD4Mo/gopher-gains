@@ -12,6 +12,7 @@ import (
 	"github.com/JuD4Mo/gopher-gains/pkg/sqlerr"
 	"github.com/JuD4Mo/gopher-gains/pkg/validation"
 	"github.com/go-chi/chi/v5"
+	"github.com/rs/zerolog"
 )
 
 type (
@@ -26,6 +27,8 @@ type (
 		Meta   *meta.Meta  `json:"meta,omitempty"`
 	}
 )
+
+var logger *zerolog.Logger
 
 func NewController(service Service, server *server.Server) *Controller {
 	return &Controller{
@@ -56,6 +59,7 @@ func (c *Controller) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *Controller) GetAll(w http.ResponseWriter, r *http.Request) {
+	logger = zerolog.Ctx(r.Context())
 	queryParams := r.URL.Query()
 	userId, _ := strconv.Atoi(queryParams.Get("userId"))
 	order, _ := strconv.Atoi(queryParams.Get("order"))
@@ -71,18 +75,21 @@ func (c *Controller) GetAll(w http.ResponseWriter, r *http.Request) {
 
 	count, err := c.service.Count(r.Context(), filters)
 	if err != nil {
+		logger.Error().Err(err).Msg("failed to count workout sessions")
 		writeError(w, err)
 		return
 	}
 
 	meta, err := meta.New(*c.server.Config, page, limit, count)
 	if err != nil {
+		logger.Error().Err(err).Msg("failed to create metadata")
 		writeError(w, err)
 		return
 	}
 
 	sessions, err := c.service.GetAllSessions(r.Context(), filters, meta.Limit(), meta.Offset())
 	if err != nil {
+		logger.Error().Err(err).Msg("failed to getAll sessions")
 		writeError(w, err)
 		return
 	}

@@ -58,6 +58,7 @@ func exerciseRoutes(ctrl *exercise.Controller) chi.Router {
 	r.Post("/create", ctrl.Create)
 	r.Get("/getAll", ctrl.GetAll)
 	r.Get("/getById/{id}", ctrl.GetById)
+	r.Get("/onerm/{exerciseId}", ctrl.GetExercise1RM)
 	r.Patch("/update/{id}", ctrl.Update)
 	return r
 }
@@ -94,6 +95,7 @@ func exerciseSetRoutes(ctrl *exerciseset.Controller) chi.Router {
 	r.Post("/create", ctrl.Create)
 	r.Get("/getAll", ctrl.GetAll)
 	r.Get("/getById/{id}", ctrl.GetById)
+	r.Get("/progress", ctrl.GetProgressSet)
 	r.Patch("/update/{id}", ctrl.Update)
 	return r
 }

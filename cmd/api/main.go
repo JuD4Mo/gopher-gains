@@ -57,7 +57,7 @@ func main() {
 	sessionController := workoutsession.NewController(sessionService, srv)
 
 	setRepo := exerciseset.NewRepository(srv.DB.Pool)
-	setService := exerciseset.NewService(setRepo)
+	setService := exerciseset.NewService(setRepo, exerciseService)
 	setController := exerciseset.NewController(setService, srv)
 
 	userRoutineRepo := userroutine.NewRepository(srv.DB.Pool)
@@ -69,12 +69,12 @@ func main() {
 	routineExerciseController := routineexercise.NewController(routineExerciseService)
 
 	controllers := router.Controllers{
-		ExerciseController:   exerciseController,
-		RoutineController:    routineController,
-		UserController:       userController,
-		SessionController:    sessionController,
-		ExerciseSetController: setController,
-		UserRoutineController: userRoutineController,
+		ExerciseController:        exerciseController,
+		RoutineController:         routineController,
+		UserController:            userController,
+		SessionController:         sessionController,
+		ExerciseSetController:     setController,
+		UserRoutineController:     userRoutineController,
 		RoutineExerciseController: routineExerciseController,
 	}
 
